@@ -10,14 +10,14 @@ def startDownload():
     def download_thread():
         try:
             ytLink = link.get()
-            ytObject = YouTube(ytLink)
+            ytObject = YouTube(ytLink, on_progress_callback=on_progress)
             video = ytObject.streams.get_highest_resolution()
 
-            title.configure(text=ytObject.title, text_color="white")
+            title.configure(text=ytObject.title, text_color="black")
             finishLabel.configure(text="")
 
             video.download()
-            finishLabel.configure(text="Downloaded!") 
+            finishLabel.configure(text="Downloaded!", text_color="black") 
 
         except:
             finishLabel.configure(text="Invalid link. Download error", text_color ="red")
@@ -25,6 +25,17 @@ def startDownload():
     # Create a thread for the download operation
     download_thread = threading.Thread(target=download_thread)
     download_thread.start()
+
+def on_progress(stream, chunk, bytes_remaining):
+    total_size = stream.filesize
+    bytes_downloaded = total_size - bytes_remaining
+    percentage_of_completion = bytes_downloaded / total_size * 100
+    per = str(int(percentage_of_completion))
+    pPercentage.configure(text=per + '%')
+    pPercentage.update()
+
+    #Update progress bar
+    progressBar.set(float(percentage_of_completion) / 100)
 
 #System Settings
 customtkinter.set_appearance_mode("System")
@@ -47,6 +58,14 @@ link.pack()
 #Finished Downloading
 finishLabel = customtkinter.CTkLabel(app, text="")
 finishLabel.pack()
+
+#Progress percentage
+pPercentage = customtkinter.CTkLabel(app, text="0%")
+pPercentage.pack()
+
+progressBar = customtkinter.CTkProgressBar(app, width=400)
+progressBar.set(0)
+progressBar.pack(padx=10, pady=10)
 
 #Download Button
 download = customtkinter.CTkButton(app, text="Download", command=startDownload)
