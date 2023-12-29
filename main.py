@@ -12,11 +12,15 @@ def startDownload():
             ytLink = link.get()
             ytObject = YouTube(ytLink)
             video = ytObject.streams.get_highest_resolution()
+
+            title.configure(text=ytObject.title, text_color="white")
+            finishLabel.configure(text="")
+
             video.download()
             finishLabel.configure(text="Downloaded!") 
 
         except:
-            finishLabel.configure(text="Invalid link")
+            finishLabel.configure(text="Invalid link. Download error", text_color ="red")
 
     # Create a thread for the download operation
     download_thread = threading.Thread(target=download_thread)
