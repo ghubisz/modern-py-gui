@@ -1,16 +1,26 @@
 import tkinter
 import customtkinter
 from pytube import YouTube
+import threading
 
 def startDownload():
-    try:
-        ytLink = link.get()
-        ytObject = YouTube(ytLink)
-        video = ytObject.streams.get_highest_resolution()
-        video.download()
-    except:
-        print("Youtube link is invalid")
-    finishLabel.configure(text="Downloaded!")
+
+    global finishLabel #Declare finishLabel as a global variable
+
+    def download_thread():
+        try:
+            ytLink = link.get()
+            ytObject = YouTube(ytLink)
+            video = ytObject.streams.get_highest_resolution()
+            video.download()
+            finishLabel.configure(text="Downloaded!") 
+
+        except:
+            finishLabel.configure(text="Invalid link")
+
+    # Create a thread for the download operation
+    download_thread = threading.Thread(target=download_thread)
+    download_thread.start()
 
 #System Settings
 customtkinter.set_appearance_mode("System")
